@@ -43,7 +43,7 @@ const Clientes: React.FC = () => {
   
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   // Save clients to storage whenever they change
   useEffect(() => {
