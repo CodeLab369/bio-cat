@@ -10,6 +10,7 @@ import type { Client } from '../types';
 const Clientes: React.FC = () => {
   const navigate = useNavigate();
   const { addNotification } = useNotification();
+  const isFirstRender = React.useRef(true);
   
   const [clients, setClients] = useState<Client[]>(() => {
     // Inicializar desde localStorage
@@ -44,19 +45,15 @@ const Clientes: React.FC = () => {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Mark as initialized after first render
+  // Save clients to storage whenever they change (but skip first render)
   useEffect(() => {
-    setIsInitialized(true);
-  }, []);
-
-  // Save clients to storage whenever they change (but not on first render)
-  useEffect(() => {
-    if (isInitialized) {
-      storage.set(STORAGE_KEYS.CLIENTS, clients);
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
     }
-  }, [clients, isInitialized]);
+    storage.set(STORAGE_KEYS.CLIENTS, clients);
+  }, [clients]);
 
   // Get unique locations for filter
   const locations = useMemo(() => {

@@ -12,6 +12,7 @@ import type { Product } from '../types';
 const Inventario: React.FC = () => {
   const navigate = useNavigate();
   const { addNotification } = useNotification();
+  const isFirstRender = React.useRef(true);
   
   const [products, setProducts] = useState<Product[]>(() => {
     // Inicializar desde localStorage
@@ -50,19 +51,15 @@ const Inventario: React.FC = () => {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Mark as initialized after first render
+  // Save products to storage whenever they change (but skip first render)
   useEffect(() => {
-    setIsInitialized(true);
-  }, []);
-
-  // Save products to storage whenever they change (but not on first render)
-  useEffect(() => {
-    if (isInitialized) {
-      storage.set(STORAGE_KEYS.PRODUCTS, products);
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
     }
-  }, [products, isInitialized]);
+    storage.set(STORAGE_KEYS.PRODUCTS, products);
+  }, [products]);
 
   // Get unique locations for filter
   const locations = useMemo(() => {
