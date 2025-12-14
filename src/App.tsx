@@ -11,7 +11,7 @@ import Toast from './components/common/Toast';
 
 function App() {
   return (
-    <BrowserRouter basename="/biocat">
+    <BrowserRouter basename="/bio-cat">
       <ThemeProvider>
         <AuthProvider>
           <NotificationProvider>
