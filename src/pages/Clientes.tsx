@@ -44,11 +44,19 @@ const Clientes: React.FC = () => {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Save clients to storage whenever they change
+  // Mark as initialized after first render
   useEffect(() => {
-    storage.set(STORAGE_KEYS.CLIENTS, clients);
-  }, [clients]);
+    setIsInitialized(true);
+  }, []);
+
+  // Save clients to storage whenever they change (but not on first render)
+  useEffect(() => {
+    if (isInitialized) {
+      storage.set(STORAGE_KEYS.CLIENTS, clients);
+    }
+  }, [clients, isInitialized]);
 
   // Get unique locations for filter
   const locations = useMemo(() => {
