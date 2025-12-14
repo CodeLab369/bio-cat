@@ -11,7 +11,11 @@ const Clientes: React.FC = () => {
   const navigate = useNavigate();
   const { addNotification } = useNotification();
   
-  const [clients, setClients] = useState<Client[]>([]);
+  const [clients, setClients] = useState<Client[]>(() => {
+    // Inicializar desde localStorage
+    const savedClients = storage.get<Client[]>(STORAGE_KEYS.CLIENTS);
+    return savedClients || [];
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
@@ -39,15 +43,9 @@ const Clientes: React.FC = () => {
   
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage] = useState(5);
 
-  // Load clients from storage
-  useEffect(() => {
-    const savedClients = storage.get<Client[]>(STORAGE_KEYS.CLIENTS) || [];
-    setClients(savedClients);
-  }, []);
-
-  // Save clients to storage
+  // Save clients to storage whenever they change
   useEffect(() => {
     storage.set(STORAGE_KEYS.CLIENTS, clients);
   }, [clients]);

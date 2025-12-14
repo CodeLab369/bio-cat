@@ -13,7 +13,11 @@ const Inventario: React.FC = () => {
   const navigate = useNavigate();
   const { addNotification } = useNotification();
   
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>(() => {
+    // Inicializar desde localStorage
+    const savedProducts = storage.get<Product[]>(STORAGE_KEYS.PRODUCTS);
+    return savedProducts || [];
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -47,13 +51,7 @@ const Inventario: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
-  // Load products from storage
-  useEffect(() => {
-    const savedProducts = storage.get<Product[]>(STORAGE_KEYS.PRODUCTS) || [];
-    setProducts(savedProducts);
-  }, []);
-
-  // Save products to storage
+  // Save products to storage whenever they change
   useEffect(() => {
     storage.set(STORAGE_KEYS.PRODUCTS, products);
   }, [products]);
