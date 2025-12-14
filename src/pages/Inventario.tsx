@@ -223,9 +223,11 @@ const Inventario: React.FC = () => {
           updatedAt: new Date().toISOString(),
         })).filter(p => p.name && p.location);
 
-        const updatedProducts = [...products, ...newProducts];
-        setProducts(updatedProducts);
-        storage.set(STORAGE_KEYS.PRODUCTS, updatedProducts);
+        setProducts(prevProducts => {
+          const updatedProducts = [...prevProducts, ...newProducts];
+          storage.set(STORAGE_KEYS.PRODUCTS, updatedProducts);
+          return updatedProducts;
+        });
         addNotification('success', `${newProducts.length} productos importados`);
       } catch (error) {
         addNotification('error', 'Error al importar archivo');
