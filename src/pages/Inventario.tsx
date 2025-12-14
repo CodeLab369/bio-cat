@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import Header from '../components/common/Header';
@@ -12,7 +12,7 @@ import type { Product } from '../types';
 const Inventario: React.FC = () => {
   const navigate = useNavigate();
   const { addNotification } = useNotification();
-  const isFirstRender = React.useRef(true);
+  const isFirstRender = useRef(true);
   
   const [products, setProducts] = useState<Product[]>(() => {
     // Inicializar desde localStorage
@@ -124,11 +124,13 @@ const Inventario: React.FC = () => {
 
     if (editingProduct) {
       // Update existing
-      setProducts(products.map(p => 
+      const updatedProducts = products.map(p => 
         p.id === editingProduct.id 
           ? { ...p, ...formData, updatedAt: new Date().toISOString() }
           : p
-      ));
+      );
+      setProducts(updatedProducts);
+      storage.set(STORAGE_KEYS.PRODUCTS, updatedProducts);
       addNotification('success', 'Producto actualizado correctamente');
     } else {
       // Add new
@@ -138,7 +140,9 @@ const Inventario: React.FC = () => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
-      setProducts([...products, newProduct]);
+      const updatedProducts = [...products, newProduct];
+      setProducts(updatedProducts);
+      storage.set(STORAGE_KEYS.PRODUCTS, updatedProducts);
       addNotification('success', 'Producto agregado correctamente');
     }
 
@@ -153,7 +157,9 @@ const Inventario: React.FC = () => {
       message: '¿Estás seguro de eliminar este producto? Esta acción no se puede deshacer.',
       type: 'danger',
       onConfirm: () => {
-        setProducts(products.filter(p => p.id !== id));
+        const updatedProducts = products.filter(p => p.id !== id);
+        setProducts(updatedProducts);
+        storage.set(STORAGE_KEYS.PRODUCTS, updatedProducts);
         addNotification('success', 'Producto eliminado');
       },
     });
@@ -174,6 +180,7 @@ const Inventario: React.FC = () => {
       type: 'danger',
       onConfirm: () => {
         setProducts([]);
+        storage.set(STORAGE_KEYS.PRODUCTS, []);
         addNotification('success', 'Inventario vaciado');
       },
     });
@@ -216,7 +223,9 @@ const Inventario: React.FC = () => {
           updatedAt: new Date().toISOString(),
         })).filter(p => p.name && p.location);
 
-        setProducts([...products, ...newProducts]);
+        const updatedProducts = [...products, ...newProducts];
+        setProducts(updatedProducts);
+        storage.set(STORAGE_KEYS.PRODUCTS, updatedProducts);
         addNotification('success', `${newProducts.length} productos importados`);
       } catch (error) {
         addNotification('error', 'Error al importar archivo');

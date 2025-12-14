@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/common/Header';
 import Modal from '../components/common/Modal';
@@ -10,7 +10,7 @@ import type { Client } from '../types';
 const Clientes: React.FC = () => {
   const navigate = useNavigate();
   const { addNotification } = useNotification();
-  const isFirstRender = React.useRef(true);
+  const isFirstRender = useRef(true);
   
   const [clients, setClients] = useState<Client[]>(() => {
     // Inicializar desde localStorage
@@ -121,6 +121,7 @@ const Clientes: React.FC = () => {
           : c
       );
       setClients(updatedClients);
+      storage.set(STORAGE_KEYS.CLIENTS, updatedClients);
       addNotification('success', 'Cliente actualizado correctamente');
     } else {
       // Add new client
@@ -130,7 +131,9 @@ const Clientes: React.FC = () => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
-      setClients([...clients, newClient]);
+      const updatedClients = [...clients, newClient];
+      setClients(updatedClients);
+      storage.set(STORAGE_KEYS.CLIENTS, updatedClients);
       addNotification('success', 'Cliente agregado correctamente');
     }
 
@@ -147,6 +150,7 @@ const Clientes: React.FC = () => {
       onConfirm: () => {
         const updatedClients = clients.filter(c => c.id !== id);
         setClients(updatedClients);
+        storage.set(STORAGE_KEYS.CLIENTS, updatedClients);
         addNotification('success', 'Cliente eliminado');
       },
     });
@@ -167,6 +171,7 @@ const Clientes: React.FC = () => {
       type: 'danger',
       onConfirm: () => {
         setClients([]);
+        storage.set(STORAGE_KEYS.CLIENTS, []);
         addNotification('success', 'Lista de clientes vaciada');
       },
     });
