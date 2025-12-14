@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import Header from '../components/common/Header';
@@ -12,7 +12,6 @@ import type { Product } from '../types';
 const Inventario: React.FC = () => {
   const navigate = useNavigate();
   const { addNotification } = useNotification();
-  const isFirstRender = useRef(true);
   
   const [products, setProducts] = useState<Product[]>(() => {
     // Inicializar desde localStorage
@@ -51,15 +50,6 @@ const Inventario: React.FC = () => {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-
-  // Save products to storage whenever they change (but skip first render)
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    storage.set(STORAGE_KEYS.PRODUCTS, products);
-  }, [products]);
 
   // Get unique locations for filter
   const locations = useMemo(() => {

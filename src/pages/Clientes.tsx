@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/common/Header';
 import Modal from '../components/common/Modal';
@@ -10,7 +10,6 @@ import type { Client } from '../types';
 const Clientes: React.FC = () => {
   const navigate = useNavigate();
   const { addNotification } = useNotification();
-  const isFirstRender = useRef(true);
   
   const [clients, setClients] = useState<Client[]>(() => {
     // Inicializar desde localStorage
@@ -45,15 +44,6 @@ const Clientes: React.FC = () => {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-
-  // Save clients to storage whenever they change (but skip first render)
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    storage.set(STORAGE_KEYS.CLIENTS, clients);
-  }, [clients]);
 
   // Get unique locations for filter
   const locations = useMemo(() => {
